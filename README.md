@@ -17,6 +17,13 @@ intended, with no wrapping and no leading spaces.
 > The button above works once the extension is approved on the Raycast Store.
 > Until then, install from source (below).
 
+## Demo
+
+Claude Code answers a question and pushes the SQL query onto the shelf on its
+own. You grab it from Raycast and paste it, clean, into your SQL console.
+
+![Ten Four in action: Claude Code pushes a SQL query to the shelf, then it is copied from Raycast and pasted cleanly into a SQL console](assets/demo.gif)
+
 ## How it works
 
 ```
