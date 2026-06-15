@@ -10,6 +10,13 @@ character grid. Ten Four fixes the root cause: snippets travel as **data**, neve
 as rendered terminal text. You copy them out of Raycast with the exact bytes
 intended, with no wrapping and no leading spaces.
 
+<a href="https://www.raycast.com/jaymcc/ten-four">
+  <img src="https://www.raycast.com/jaymcc/ten-four/install_button@2x.png" height="64" alt="Add Ten Four to Raycast" />
+</a>
+
+> The button above works once the extension is approved on the Raycast Store.
+> Until then, install from source (below).
+
 ## How it works
 
 ```
@@ -25,27 +32,32 @@ your terminal / Claude Code  ──tenfour──▶  ~/.ten-four.json  ──▶
 
 ## Install
 
-### 1. The Raycast extension
+### Option A: Raycast Store (one click, once approved)
 
-From this repo (developer mode):
+Click **Add to Raycast** above, or search "Ten Four" in the Raycast Store. Then
+run the **Install Ten Four CLI** command to add the `tenfour` writer.
 
-```sh
-npm install
-npm run dev      # registers "Ten Four" in Raycast; keep running while developing
-```
+### Option B: From source (works today)
 
-Or, once published, install **Ten Four** from the Raycast Store.
-
-### 2. The CLI
-
-Easiest: open the **Install Ten Four CLI** command inside Raycast and click
-**Install CLI**. It copies `tenfour` into your `PATH` for you.
-
-Or from the terminal:
+Requires [Node.js](https://nodejs.org) and the [Raycast](https://raycast.com)
+app.
 
 ```sh
-./install.sh        # symlinks assets/tenfour into your PATH
+git clone https://github.com/berwickgeek/ten-four.git
+cd ten-four
+npm ci
+npm run dev
 ```
+
+`npm run dev` builds the extension and registers it in Raycast immediately. It
+**stays installed even after you stop the dev server** (Raycast keeps its own
+compiled copy), so you only need to run this once. You can then close the
+terminal.
+
+Then install the CLI either way:
+
+- In Raycast, open **Install Ten Four CLI** and click **Install CLI**, or
+- From the repo: `./install.sh` (symlinks `assets/tenfour` into your `PATH`).
 
 ## Usage
 
