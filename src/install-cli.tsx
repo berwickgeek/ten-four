@@ -39,7 +39,11 @@ function isWritable(dir: string): boolean {
   }
 }
 
-function pickBinDir(): { dir: string; assumedOnPath: boolean; mustCreate: boolean } {
+function pickBinDir(): {
+  dir: string;
+  assumedOnPath: boolean;
+  mustCreate: boolean;
+} {
   for (const dir of CANDIDATES.slice(0, 2)) {
     if (existsSync(dir) && isWritable(dir)) {
       return { dir, assumedOnPath: true, mustCreate: false };
@@ -47,7 +51,11 @@ function pickBinDir(): { dir: string; assumedOnPath: boolean; mustCreate: boolea
   }
   const fallback = CANDIDATES[2];
   const onPath = (process.env.PATH || "").split(":").includes(fallback);
-  return { dir: fallback, assumedOnPath: onPath, mustCreate: !existsSync(fallback) };
+  return {
+    dir: fallback,
+    assumedOnPath: onPath,
+    mustCreate: !existsSync(fallback),
+  };
 }
 
 function findInstalled(): string | null {

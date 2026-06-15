@@ -2,11 +2,14 @@
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "ten-four",
   "title": "Ten Four",
-  "description": "A shelf of clean, copyable snippets pushed from your terminal or Claude Code. \"10-4, copy that\" — copy them out of Raycast with pristine formatting, no mangled line breaks.",
+  "description": "A shelf of clean, copyable snippets pushed from your terminal or Claude Code. \"10-4, copy that\": copy them out of Raycast with pristine formatting, no mangled line breaks.",
   "icon": "icon.png",
-  "author": "berwickgeek",
+  "author": "jaymcc",
   "license": "MIT",
-  "categories": ["Productivity", "Developer Tools"],
+  "categories": [
+    "Productivity",
+    "Developer Tools"
+  ],
   "commands": [
     {
       "name": "ten-four",
@@ -27,7 +30,7 @@
     "@raycast/utils": "^1.19.0"
   },
   "devDependencies": {
-    "@raycast/eslint-config": "^1.0.11",
+    "@raycast/eslint-config": "^2.1.1",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "eslint": "^9.0.0",

@@ -22,8 +22,7 @@ import {
 } from "fs";
 import { dirname } from "path";
 
-const STORE =
-  process.env.TENFOUR_FILE || join(homedir(), ".ten-four.json");
+const STORE = process.env.TENFOUR_FILE || join(homedir(), ".ten-four.json");
 
 type Item = {
   id: string;
@@ -108,7 +107,9 @@ export default function Command() {
   }
 
   function togglePin(item: Item) {
-    mutate(items.map((i) => (i.id === item.id ? { ...i, pinned: !i.pinned } : i)));
+    mutate(
+      items.map((i) => (i.id === item.id ? { ...i, pinned: !i.pinned } : i)),
+    );
   }
 
   function remove(item: Item) {
@@ -120,7 +121,10 @@ export default function Command() {
     const ok = await confirmAlert({
       title: "Clear the whole shelf?",
       message: "This removes every snippet, including pinned ones.",
-      primaryAction: { title: "Clear All", style: Alert.ActionStyle.Destructive },
+      primaryAction: {
+        title: "Clear All",
+        style: Alert.ActionStyle.Destructive,
+      },
     });
     if (ok) {
       mutate([]);
