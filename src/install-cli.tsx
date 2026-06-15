@@ -105,7 +105,7 @@ export default function Command() {
 
   const markdown = `# Ten Four CLI
 
-Installs the \`tenfour\` command so your terminal — and tools like **Claude Code** — can push snippets onto your shelf:
+Installs the \`tenfour\` command so your terminal (and tools like **Claude Code**) can push snippets onto your shelf:
 
 \`\`\`sh
 tenfour --label "Railway URL" "https://my-app.up.railway.app"

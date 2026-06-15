@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /*
- * tenfour — "copy that." Push a clean, copyable snippet onto the Ten Four shelf.
+ * tenfour: "copy that." Push a clean, copyable snippet onto the Ten Four shelf.
  *
  * The shelf is a JSON file read by the "Ten Four" Raycast extension. Snippets
  * travel as data (never as rendered terminal text), so when you copy them out
- * of Raycast you get the exact bytes — no wrapping, no stray indentation, no
+ * of Raycast you get the exact bytes, with no wrapping, no stray indentation, no
  * mangled line breaks.
  *
  * Usage:
@@ -118,7 +118,7 @@ function main() {
   const rest = items.filter((it) => !it.pinned).slice(0, MAX_ITEMS);
   save([...pinned, ...rest].slice(0, MAX_ITEMS + pinned.length));
 
-  console.log(`📋 10-4 — added to shelf: ${item.label}`);
+  console.log(`📋 10-4, added to shelf: ${item.label}`);
 }
 
 main();
