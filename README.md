@@ -126,7 +126,7 @@ and double-pushes.
 ## Configuration
 
 - **CLI endpoint:** set `TENFOUR_URL` to your shelf service URL (e.g.
-  `https://guppy.tail72863e.ts.net/shelf`). The CLI errors when this is unset.
+  `https://<your-host>.ts.net/shelf`). The CLI errors when this is unset.
 - **Extension endpoint:** set the **Shelf URL** preference in Raycast to the same
   URL.
 - **Service storage:** the service stores snippets at `~/.ten-four.json` on the

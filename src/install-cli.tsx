@@ -130,7 +130,7 @@ ${onPathNote}
 **Shelf URL** preference):
 
 \`\`\`sh
-export TENFOUR_URL=https://guppy.tail72863e.ts.net/shelf
+export TENFOUR_URL=https://<your-host>.ts.net/shelf
 \`\`\`
 
 ---
