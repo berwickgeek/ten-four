@@ -27,12 +27,15 @@ own. You grab it from Raycast and paste it, clean, into your SQL console.
 ## How it works
 
 ```
-your terminal / Claude Code  ──tenfour──▶  ~/.ten-four.json  ──▶  Raycast "Ten Four"
-        (writer)                            (the shelf)              (reader)
+your terminal / Claude Code  ──tenfour──▶  shelf service (/shelf)  ──▶  Raycast "Ten Four"
+                              (TENFOUR_URL)   tailnet, owns the store     (Shelf URL pref)
 ```
 
-- **`tenfour`**: a tiny, dependency-free Node CLI that appends a snippet to the
-  shelf file.
+The shelf is a small HTTP service (see [`server/`](server/README.md)) that owns
+the store. Run it on any always-on host on your network, expose `/shelf` over
+your tailnet with `tailscale serve`, then point `TENFOUR_URL` (CLI) and the
+extension's **Shelf URL** preference at it. Snippets still travel as data, so you
+copy them out of Raycast with pristine formatting.
 - **Ten Four (Raycast extension)**: a searchable list of your snippets. Hit your
   Raycast hotkey, type a letter or two, press <kbd>↵</kbd> to copy (or
   <kbd>⌘</kbd> to paste into the front app).
@@ -122,8 +125,13 @@ and double-pushes.
 
 ## Configuration
 
-- **Shelf location:** `~/.ten-four.json` by default. Override with the
-  `TENFOUR_FILE` environment variable (set it for both the CLI and Raycast).
+- **CLI endpoint:** set `TENFOUR_URL` to your shelf service URL (e.g.
+  `https://guppy.tail72863e.ts.net/shelf`). The CLI errors when this is unset.
+- **Extension endpoint:** set the **Shelf URL** preference in Raycast to the same
+  URL.
+- **Service storage:** the service stores snippets at `~/.ten-four.json` on the
+  server host (override with `TENFOUR_FILE`). It listens on port 7801 (override
+  with `PORT`). See [`server/README.md`](server/README.md) for setup.
 - The shelf keeps the most recent 200 snippets; pinned snippets are never
   trimmed.
 

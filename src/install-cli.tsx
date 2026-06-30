@@ -125,6 +125,16 @@ ${onPathNote}
 
 ---
 
+**Point it at your shelf.** The CLI pushes to the shelf service, so set
+\`TENFOUR_URL\` to your service endpoint (and the same URL in this extension's
+**Shelf URL** preference):
+
+\`\`\`sh
+export TENFOUR_URL=https://guppy.tail72863e.ts.net/shelf
+\`\`\`
+
+---
+
 **For Claude Code users:** add this to your \`CLAUDE.md\` so Claude pushes copyable
 snippets automatically:
 
