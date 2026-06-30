@@ -85,7 +85,7 @@ Then summon Raycast → **Ten Four Shelf** → copy.
 
 The reliable way is a **sentinel marker** plus a `Stop` hook: Claude wraps any
 snippet in an invisible HTML comment, and the hook scrapes it onto the shelf
-automatically — so it can't be forgotten the way a manual CLI call can.
+automatically, so it cannot be forgotten the way a manual CLI call can.
 
 Add this to your `CLAUDE.md`:
 
@@ -120,7 +120,7 @@ For scripts and one-offs where the marker can't reach, call the CLI directly:
 tenfour --label "<short label>" "<the exact text>"
 ```
 
-Don't do both for the same snippet — a manual push bypasses the hook's hash log
+Don't do both for the same snippet: a manual push bypasses the hook's hash log
 and double-pushes.
 
 ## Configuration

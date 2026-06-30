@@ -102,7 +102,7 @@ async function main() {
   }
 
   let text = textParts.join(" ");
-  // allow: tenfour < file — but only when stdin is piped/redirected, never on
+  // allow: tenfour < file, but only when stdin is piped/redirected, never on
   // an interactive TTY (where readStdin would block forever waiting on input)
   if (!text.trim() && !process.stdin.isTTY) text = readStdin();
   text = text.replace(/\n$/, ""); // drop one trailing newline, keep internal ones
