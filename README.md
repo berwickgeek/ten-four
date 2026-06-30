@@ -80,14 +80,45 @@ Then summon Raycast → **Ten Four Shelf** → copy.
 
 ## Use with Claude Code
 
-Add this to your `CLAUDE.md` so Claude pushes copyable snippets automatically:
+The reliable way is a **sentinel marker** plus a `Stop` hook: Claude wraps any
+snippet in an invisible HTML comment, and the hook scrapes it onto the shelf
+automatically — so it can't be forgotten the way a manual CLI call can.
+
+Add this to your `CLAUDE.md`:
 
 ```md
 When you output a snippet I'm likely to want to copy (a URL, token, command,
-path, or code block), also run:
-  tenfour --label "<short label>" "<the exact text>"
-so it lands on my Ten Four shelf with clean formatting.
+path, or code block), wrap it in a sentinel marker:
+
+  <!--shelf:Short Label-->
+  ... the exact text ...
+  <!--/shelf-->
+
+The markers render as nothing in the terminal, so I still see a clean snippet.
 ```
+
+Then wire the hook in `~/.claude/settings.json` so it fires on every turn:
+
+```json
+{
+  "hooks": {
+    "Stop": [{ "hooks": [{ "type": "command", "command": "~/.claude/hooks/shelf-push.sh" }] }]
+  }
+}
+```
+
+The hook scans each assistant message for `<!--shelf:…-->` blocks, strips any
+code fence, and pushes the contents via `tenfour`. It dedups by content hash, so
+re-fires never double-push.
+
+For scripts and one-offs where the marker can't reach, call the CLI directly:
+
+```sh
+tenfour --label "<short label>" "<the exact text>"
+```
+
+Don't do both for the same snippet — a manual push bypasses the hook's hash log
+and double-pushes.
 
 ## Configuration
 
