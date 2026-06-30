@@ -25,6 +25,16 @@
       "mode": "view"
     }
   ],
+  "preferences": [
+    {
+      "name": "shelfUrl",
+      "title": "Shelf URL",
+      "description": "The Ten Four shelf service endpoint, e.g. https://guppy.tail72863e.ts.net/shelf",
+      "type": "textfield",
+      "required": true,
+      "placeholder": "https://guppy.tail72863e.ts.net/shelf"
+    }
+  ],
   "dependencies": {
     "@raycast/api": "^1.99.0"
   },

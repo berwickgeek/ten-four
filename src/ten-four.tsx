@@ -8,21 +8,9 @@ import {
   Alert,
   showToast,
   Toast,
+  getPreferenceValues,
 } from "@raycast/api";
-import { useEffect, useState } from "react";
-import { homedir } from "os";
-import { join } from "path";
-import {
-  readFileSync,
-  writeFileSync,
-  mkdirSync,
-  watchFile,
-  unwatchFile,
-  existsSync,
-} from "fs";
-import { dirname } from "path";
-
-const STORE = process.env.TENFOUR_FILE || join(homedir(), ".ten-four.json");
+import { useEffect, useRef, useState } from "react";
 
 type Item = {
   id: string;
@@ -32,19 +20,9 @@ type Item = {
   pinned?: boolean;
 };
 
-function load(): Item[] {
-  try {
-    const data = JSON.parse(readFileSync(STORE, "utf8"));
-    return Array.isArray(data) ? data : [];
-  } catch {
-    return [];
-  }
-}
-
-function persist(items: Item[]) {
-  mkdirSync(dirname(STORE), { recursive: true });
-  writeFileSync(STORE, JSON.stringify(items, null, 2));
-}
+const { shelfUrl } = getPreferenceValues<{ shelfUrl: string }>();
+const BASE = shelfUrl.replace(/\/$/, "");
+const POLL_MS = 1000;
 
 function sortItems(items: Item[]): Item[] {
   return [...items].sort((a, b) => {
@@ -74,60 +52,76 @@ function asMarkdown(item: Item): string {
   return `### ${item.label}\n\n${fence}\n${item.text}\n${fence}`;
 }
 
+async function shelfFetch(suffix = "", init?: RequestInit): Promise<Response> {
+  const res = await fetch(BASE + suffix, init);
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  return res;
+}
+
 export default function Command() {
   const [items, setItems] = useState<Item[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [showDetail, setShowDetail] = useState(true);
+  const lastGood = useRef<Item[]>([]);
+  const reachable = useRef(true);
+
+  async function refresh() {
+    try {
+      const data = (await (await shelfFetch()).json()) as Item[];
+      lastGood.current = data;
+      setItems(data);
+      reachable.current = true;
+    } catch (error) {
+      // Keep showing the last-known list instead of blanking, and only toast
+      // on the transition from reachable -> unreachable.
+      if (reachable.current) {
+        showToast({
+          style: Toast.Style.Failure,
+          title: "Can't reach shelf",
+          message: error instanceof Error ? error.message : String(error),
+        });
+      }
+      reachable.current = false;
+      setItems(lastGood.current);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   useEffect(() => {
-    setItems(load());
-    if (existsSync(STORE)) {
-      watchFile(STORE, { interval: 400 }, () => setItems(load()));
-    } else {
-      // poll for the file to appear, then watch it
-      const iv = setInterval(() => {
-        if (existsSync(STORE)) {
-          setItems(load());
-          watchFile(STORE, { interval: 400 }, () => setItems(load()));
-          clearInterval(iv);
-        }
-      }, 600);
-      return () => {
-        clearInterval(iv);
-        unwatchFile(STORE);
-      };
-    }
-    return () => unwatchFile(STORE);
+    refresh();
+    const iv = setInterval(refresh, POLL_MS);
+    return () => clearInterval(iv);
   }, []);
 
-  const sorted = sortItems(items);
+  function toastError(error: unknown) {
+    showToast({
+      style: Toast.Style.Failure,
+      title: "Shelf action failed",
+      message: error instanceof Error ? error.message : String(error),
+    });
+  }
 
-  // Persist first, then update the UI — that way a failed write leaves the
-  // on-disk file and the displayed state in sync. Returns false (with a
-  // failure toast) so callers can skip their own success feedback.
-  function mutate(next: Item[]): boolean {
+  async function togglePin(item: Item) {
     try {
-      persist(next);
-    } catch (error) {
-      showToast({
-        style: Toast.Style.Failure,
-        title: "Couldn't save shelf",
-        message: error instanceof Error ? error.message : String(error),
+      await shelfFetch(`/${item.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pinned: !item.pinned }),
       });
-      return false;
+      await refresh();
+    } catch (error) {
+      toastError(error);
     }
-    setItems(next);
-    return true;
   }
 
-  function togglePin(item: Item) {
-    mutate(
-      items.map((i) => (i.id === item.id ? { ...i, pinned: !i.pinned } : i)),
-    );
-  }
-
-  function remove(item: Item) {
-    if (mutate(items.filter((i) => i.id !== item.id))) {
+  async function remove(item: Item) {
+    try {
+      await shelfFetch(`/${item.id}`, { method: "DELETE" });
+      await refresh();
       showToast({ style: Toast.Style.Success, title: "Removed" });
+    } catch (error) {
+      toastError(error);
     }
   }
 
@@ -140,13 +134,21 @@ export default function Command() {
         style: Alert.ActionStyle.Destructive,
       },
     });
-    if (ok && mutate([])) {
+    if (!ok) return;
+    try {
+      await shelfFetch("", { method: "DELETE" });
+      await refresh();
       showToast({ style: Toast.Style.Success, title: "Shelf cleared" });
+    } catch (error) {
+      toastError(error);
     }
   }
 
+  const sorted = sortItems(items);
+
   return (
     <List
+      isLoading={isLoading}
       isShowingDetail={showDetail && sorted.length > 0}
       searchBarPlaceholder="Search snippets…"
     >
