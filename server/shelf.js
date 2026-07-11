@@ -97,6 +97,9 @@ async function handle(req, res) {
         text,
         ts: Date.now(),
         pinned: false,
+        // Optional provenance ("project · session8") from pushers that send it, e.g. the
+        // guppy shelf-push hook. Viewers that don't know the field just ignore it.
+        ...(body.source ? { source: String(body.source).slice(0, 120) } : {}),
       };
       save(truncate([item, ...load()]));
       return json(res, 201, item);
