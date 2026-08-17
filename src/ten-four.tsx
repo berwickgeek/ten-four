@@ -127,7 +127,10 @@ export default function Command() {
       <List.EmptyView
         icon={Icon.Tray}
         title="Shelf is empty"
-        description={`Push a snippet from your terminal:  tenfour "your text"`}
+        // Name the backend here: "empty" means something different when the
+        // shelf is a file on this Mac than when it is a service that may be
+        // unreachable, and it is the fastest way to spot a misread preference.
+        description={`Push a snippet from your terminal:  tenfour "your text"\n\nReading ${shelf.isRemote ? "shelf service" : "local file"}: ${shelf.origin}`}
       />
       {sorted.map((item) => (
         <List.Item
