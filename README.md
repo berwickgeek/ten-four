@@ -1,14 +1,14 @@
 # Ten Four
 
-**"10-4, copy that."** A shelf of clean, copyable snippets — pushed from your
+**"10-4, copy that."** A shelf of clean, copyable snippets, pushed from your
 terminal or from **Claude Code**, browsed and copied from **Raycast**.
 
 When a tool prints something you want to copy (a URL, an API key, a command, a
 code block), copying it straight out of the terminal gives you mangled line
-breaks and stray indentation — because you're selecting reflowed text off the
+breaks and stray indentation, because you're selecting reflowed text off the
 character grid. Ten Four fixes the root cause: snippets travel as **data**, never
 as rendered terminal text. You copy them out of Raycast with the exact bytes
-intended — no wrapping, no leading spaces.
+intended, with no wrapping and no leading spaces.
 
 ## How it works
 
@@ -17,9 +17,9 @@ your terminal / Claude Code  ──tenfour──▶  ~/.ten-four.json  ──▶
         (writer)                            (the shelf)              (reader)
 ```
 
-- **`tenfour`** — a tiny, dependency-free Node CLI that appends a snippet to the
+- **`tenfour`**: a tiny, dependency-free Node CLI that appends a snippet to the
   shelf file.
-- **Ten Four (Raycast extension)** — a searchable list of your snippets. Hit your
+- **Ten Four (Raycast extension)**: a searchable list of your snippets. Hit your
   Raycast hotkey, type a letter or two, press <kbd>↵</kbd> to copy (or
   <kbd>⌘</kbd> to paste into the front app).
 

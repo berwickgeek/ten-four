@@ -22,8 +22,7 @@ import {
 } from "fs";
 import { dirname } from "path";
 
-const STORE =
-  process.env.TENFOUR_FILE || join(homedir(), ".ten-four.json");
+const STORE = process.env.TENFOUR_FILE || join(homedir(), ".ten-four.json");
 
 type Item = {
   id: string;
@@ -102,28 +101,46 @@ export default function Command() {
 
   const sorted = sortItems(items);
 
-  function mutate(next: Item[]) {
+  // Persist first, then update the UI — that way a failed write leaves the
+  // on-disk file and the displayed state in sync. Returns false (with a
+  // failure toast) so callers can skip their own success feedback.
+  function mutate(next: Item[]): boolean {
+    try {
+      persist(next);
+    } catch (error) {
+      showToast({
+        style: Toast.Style.Failure,
+        title: "Couldn't save shelf",
+        message: error instanceof Error ? error.message : String(error),
+      });
+      return false;
+    }
     setItems(next);
-    persist(next);
+    return true;
   }
 
   function togglePin(item: Item) {
-    mutate(items.map((i) => (i.id === item.id ? { ...i, pinned: !i.pinned } : i)));
+    mutate(
+      items.map((i) => (i.id === item.id ? { ...i, pinned: !i.pinned } : i)),
+    );
   }
 
   function remove(item: Item) {
-    mutate(items.filter((i) => i.id !== item.id));
-    showToast({ style: Toast.Style.Success, title: "Removed" });
+    if (mutate(items.filter((i) => i.id !== item.id))) {
+      showToast({ style: Toast.Style.Success, title: "Removed" });
+    }
   }
 
   async function clearAll() {
     const ok = await confirmAlert({
       title: "Clear the whole shelf?",
       message: "This removes every snippet, including pinned ones.",
-      primaryAction: { title: "Clear All", style: Alert.ActionStyle.Destructive },
+      primaryAction: {
+        title: "Clear All",
+        style: Alert.ActionStyle.Destructive,
+      },
     });
-    if (ok) {
-      mutate([]);
+    if (ok && mutate([])) {
       showToast({ style: Toast.Style.Success, title: "Shelf cleared" });
     }
   }

@@ -6,7 +6,6 @@ import {
   Toast,
   environment,
   Icon,
-  open,
 } from "@raycast/api";
 import { useEffect, useState } from "react";
 import { homedir } from "os";
@@ -39,7 +38,11 @@ function isWritable(dir: string): boolean {
   }
 }
 
-function pickBinDir(): { dir: string; assumedOnPath: boolean; mustCreate: boolean } {
+function pickBinDir(): {
+  dir: string;
+  assumedOnPath: boolean;
+  mustCreate: boolean;
+} {
   for (const dir of CANDIDATES.slice(0, 2)) {
     if (existsSync(dir) && isWritable(dir)) {
       return { dir, assumedOnPath: true, mustCreate: false };
@@ -47,7 +50,11 @@ function pickBinDir(): { dir: string; assumedOnPath: boolean; mustCreate: boolea
   }
   const fallback = CANDIDATES[2];
   const onPath = (process.env.PATH || "").split(":").includes(fallback);
-  return { dir: fallback, assumedOnPath: onPath, mustCreate: !existsSync(fallback) };
+  return {
+    dir: fallback,
+    assumedOnPath: onPath,
+    mustCreate: !existsSync(fallback),
+  };
 }
 
 function findInstalled(): string | null {
@@ -70,6 +77,9 @@ export default function Command() {
   async function install() {
     try {
       if (target.mustCreate) mkdirSync(target.dir, { recursive: true });
+      // Copy (not symlink) on purpose: the installed CLI must survive the
+      // extension being updated, moved, or uninstalled, rather than dangling
+      // at Raycast's internal assetsPath.
       copyFileSync(SOURCE, dest);
       chmodSync(dest, 0o755);
       setInstalledAt(dest);
@@ -97,7 +107,7 @@ export default function Command() {
 
   const markdown = `# Ten Four CLI
 
-Installs the \`tenfour\` command so your terminal — and tools like **Claude Code** — can push snippets onto your shelf:
+Installs the \`tenfour\` command so your terminal (and tools like **Claude Code**) can push snippets onto your shelf:
 
 \`\`\`sh
 tenfour --label "Railway URL" "https://my-app.up.railway.app"
@@ -136,11 +146,7 @@ so it lands on my Ten Four shelf with clean formatting.
             icon={Icon.Download}
             onAction={install}
           />
-          <Action
-            title="Reveal in Finder"
-            icon={Icon.Finder}
-            onAction={() => open(target.dir)}
-          />
+          <Action.ShowInFinder path={target.dir} />
         </ActionPanel>
       }
     />
