@@ -8,28 +8,11 @@ import {
   Alert,
   showToast,
   Toast,
-  getPreferenceValues,
 } from "@raycast/api";
 import { useEffect, useRef, useState } from "react";
+import { getShelf, sortItems, type Item } from "./shelf";
 
-type Item = {
-  id: string;
-  label: string;
-  text: string;
-  ts: number;
-  pinned?: boolean;
-};
-
-const { shelfUrl } = getPreferenceValues<{ shelfUrl: string }>();
-const BASE = shelfUrl.replace(/\/$/, "");
-const POLL_MS = 1000;
-
-function sortItems(items: Item[]): Item[] {
-  return [...items].sort((a, b) => {
-    if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
-    return b.ts - a.ts;
-  });
-}
+const shelf = getShelf();
 
 function timeAgo(ts: number): string {
   const s = Math.floor((Date.now() - ts) / 1000);
@@ -52,12 +35,6 @@ function asMarkdown(item: Item): string {
   return `### ${item.label}\n\n${fence}\n${item.text}\n${fence}`;
 }
 
-async function shelfFetch(suffix = "", init?: RequestInit): Promise<Response> {
-  const res = await fetch(BASE + suffix, init);
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-  return res;
-}
-
 export default function Command() {
   const [items, setItems] = useState<Item[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -67,7 +44,7 @@ export default function Command() {
 
   async function refresh() {
     try {
-      const data = (await (await shelfFetch()).json()) as Item[];
+      const data = await shelf.load();
       lastGood.current = data;
       setItems(data);
       reachable.current = true;
@@ -77,7 +54,7 @@ export default function Command() {
       if (reachable.current) {
         showToast({
           style: Toast.Style.Failure,
-          title: "Can't reach shelf",
+          title: shelf.isRemote ? "Can't reach shelf" : "Can't read shelf",
           message: error instanceof Error ? error.message : String(error),
         });
       }
@@ -90,8 +67,7 @@ export default function Command() {
 
   useEffect(() => {
     refresh();
-    const iv = setInterval(refresh, POLL_MS);
-    return () => clearInterval(iv);
+    return shelf.watch(refresh);
   }, []);
 
   function toastError(error: unknown) {
@@ -104,11 +80,7 @@ export default function Command() {
 
   async function togglePin(item: Item) {
     try {
-      await shelfFetch(`/${item.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pinned: !item.pinned }),
-      });
+      await shelf.setPinned(item, !item.pinned);
       await refresh();
     } catch (error) {
       toastError(error);
@@ -117,7 +89,7 @@ export default function Command() {
 
   async function remove(item: Item) {
     try {
-      await shelfFetch(`/${item.id}`, { method: "DELETE" });
+      await shelf.remove(item);
       await refresh();
       showToast({ style: Toast.Style.Success, title: "Removed" });
     } catch (error) {
@@ -136,7 +108,7 @@ export default function Command() {
     });
     if (!ok) return;
     try {
-      await shelfFetch("", { method: "DELETE" });
+      await shelf.clear();
       await refresh();
       showToast({ style: Toast.Style.Success, title: "Shelf cleared" });
     } catch (error) {

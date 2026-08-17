@@ -29,10 +29,10 @@
     {
       "name": "shelfUrl",
       "title": "Shelf URL",
-      "description": "The Ten Four shelf service endpoint, e.g. https://guppy.tail72863e.ts.net/shelf",
+      "description": "Optional. Leave blank to keep the shelf in a local file (~/.ten-four.json) on this Mac. Set it to a Ten Four shelf service endpoint to read snippets pushed from another machine.",
       "type": "textfield",
-      "required": true,
-      "placeholder": "https://guppy.tail72863e.ts.net/shelf"
+      "required": false,
+      "placeholder": "https://your-host.ts.net/shelf"
     }
   ],
   "dependencies": {

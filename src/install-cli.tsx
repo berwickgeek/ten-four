@@ -125,9 +125,12 @@ ${onPathNote}
 
 ---
 
-**Point it at your shelf.** The CLI pushes to the shelf service, so set
-\`TENFOUR_URL\` to your service endpoint (and the same URL in this extension's
-**Shelf URL** preference):
+**Where the shelf lives.** By default the CLI and this extension share a local
+file, \`~/.ten-four.json\`, and nothing else is needed.
+
+To push from *another* machine (a dev box, a container, Claude Code on a
+server), run the shelf service instead, set \`TENFOUR_URL\` there, and put the
+same URL in this extension's **Shelf URL** preference:
 
 \`\`\`sh
 export TENFOUR_URL=https://<your-host>.ts.net/shelf

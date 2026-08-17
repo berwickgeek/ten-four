@@ -26,16 +26,29 @@ own. You grab it from Raycast and paste it, clean, into your SQL console.
 
 ## How it works
 
+There are two shelves, and you pick one with a single preference.
+
+**Local (the default, zero setup).** The CLI and the extension share a JSON file
+on your Mac:
+
 ```
-your terminal / Claude Code  ──tenfour──▶  shelf service (/shelf)  ──▶  Raycast "Ten Four"
-                              (TENFOUR_URL)   tailnet, owns the store     (Shelf URL pref)
+your terminal / Claude Code  ──tenfour──▶  ~/.ten-four.json  ──▶  Raycast "Ten Four"
 ```
 
-The shelf is a small HTTP service (see [`server/`](server/README.md)) that owns
-the store. Run it on any always-on host on your network, expose `/shelf` over
-your tailnet with `tailscale serve`, then point `TENFOUR_URL` (CLI) and the
-extension's **Shelf URL** preference at it. Snippets still travel as data, so you
-copy them out of Raycast with pristine formatting.
+**Remote (push from another machine).** Run the small HTTP service (see
+[`server/`](server/README.md)) on an always-on host, expose `/shelf` over your
+tailnet with `tailscale serve`, then point `TENFOUR_URL` (CLI) and the
+extension's **Shelf URL** preference at it:
+
+```
+your dev box / Claude Code  ──tenfour──▶  shelf service (/shelf)  ──▶  Raycast "Ten Four"
+                             (TENFOUR_URL)   tailnet, owns the store     (Shelf URL pref)
+```
+
+Set the **Shelf URL** preference and you are in remote mode; leave it blank and
+you are in local mode. Either way snippets travel as data, so you copy them out
+of Raycast with pristine formatting.
+
 - **Ten Four (Raycast extension)**: a searchable list of your snippets. Hit your
   Raycast hotkey, type a letter or two, press <kbd>↵</kbd> to copy (or
   <kbd>⌘</kbd> to paste into the front app).
@@ -125,13 +138,16 @@ and double-pushes.
 
 ## Configuration
 
+Local mode needs no configuration at all. For remote mode:
+
 - **CLI endpoint:** set `TENFOUR_URL` to your shelf service URL (e.g.
-  `https://<your-host>.ts.net/shelf`). The CLI errors when this is unset.
+  `https://<your-host>.ts.net/shelf`). Unset, the CLI writes the local file.
 - **Extension endpoint:** set the **Shelf URL** preference in Raycast to the same
-  URL.
-- **Service storage:** the service stores snippets at `~/.ten-four.json` on the
-  server host (override with `TENFOUR_FILE`). It listens on port 7801 (override
-  with `PORT`). See [`server/README.md`](server/README.md) for setup.
+  URL. Blank, the extension reads the local file.
+- **Storage:** snippets live at `~/.ten-four.json` (override with
+  `TENFOUR_FILE`), on your Mac in local mode or on the server host in remote
+  mode. The service listens on port 7801 (override with `PORT`). See
+  [`server/README.md`](server/README.md) for setup.
 - The shelf keeps the most recent 200 snippets; pinned snippets are never
   trimmed.
 
